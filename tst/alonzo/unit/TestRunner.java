@@ -59,7 +59,7 @@ public class TestRunner {
         final boolean overallFailure = failed.size() + errored.size() > 0;
 
         System.out.println(String.format(
-                "Test Results: %s\n%d Total [%d Passed, %d Failed, %d Errors]\n",
+                "Test Results: %s\n%d Total [%d Passed, %d Failed, %d Errors]",
                 overallFailure ? "FAILURE" : "PASS",
                 results.size(), passed.size(), failed.size(), errored.size()));
     }
