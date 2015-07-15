@@ -16,7 +16,7 @@ DESTDIR = $(ROOT)/../alonzo-java
 all: build
 
 clean:
-	@rm -r $(ROOT)/_site/
+	@rm -rf $(ROOT)/_site/
 
 build:
 	@cd $(ROOT); jekyll build --destination $(DESTDIR)

@@ -14,3 +14,6 @@ kramdown:
 
 exclude: [Makefile, .gitignore]
 keep_files: [.git, LICENSE_CONTENT, LICENSE_THEME, .gitignore, .nojekyll]
+
+safe: false
+gems: [jekyll_github_sample]
