@@ -12,7 +12,7 @@ highlighter: pygments
 kramdown:
   input: GFM
 
-exclude: [Makefile, .gitignore]
+exclude: [Makefile, .gitignore, README.md, Gemfile, jekyll-serve.sh]
 keep_files: [.git, LICENSE_CONTENT, LICENSE_THEME, .gitignore, .nojekyll]
 
 safe: false
