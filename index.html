@@ -1,16 +1,77 @@
----
-layout: default
----
-<p>Alonzo is a Java software project to code a Lambda Calculus
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo</title>
+  <meta name="description" content="Alonzo is a Java software project to code a Lambda Calculus interpreter. Alongside the code lives this blog dedicated to writing and teaching about what goes into writing the interpreter, and interesting coding choices.
+">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+      <div class="wrapper">
+      <header>
+  <h1>Alonzo</h1>
+  <p>A Lambda Calculus interpreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+  <ul>
+    <li><a href="https://github.com/alexleighton/alonzo-java/zipball/master">Download <strong>ZIP File</strong></a></li>
+    <li><a href="https://github.com/alexleighton/alonzo-java/tarball/master">Download <strong>TAR Ball</strong></a></li>
+    <li><a href="http://github.com/alexleighton/alonzo-java">View On <strong>GitHub</strong></a></li>
+  </ul>
+</header>
+
+
+      <section>
+        <div class="navbar-container">
+        <ul>
+          <li><a href="/alonzo-java/about.html">About</a></li>
+          
+          <li class="ellipsize-overflow"><a href="/alonzo-java/misc/2015/07/12/welcome.html">Latest Post</a></li>
+        </ul>
+        </div>
+
+        <p>Alonzo is a Java software project to code a Lambda Calculus
   interpreter. Alongside the code lives this blog dedicated to writing
   and teaching about code that goes into the interpreter, and
   interesting coding choices.</p>
 
 <h2>Blog Posts</h2>
-{% for post in site.posts %}
-<span style="float: right">{{ post.date | date: "%b %-d, %Y" }}</span>
-<h3 class="post-link"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+
+<span style="float: right">Jul 12, 2015</span>
+<h3 class="post-link"><a href="/alonzo-java/misc/2015/07/12/welcome.html">Welcome & Introduction</a></h3>
 <p>
-  <em>{{ post.excerpt }}</em>
+  <em>Welcome to the project blog of Alonzo — investigation and discussion of the code, as it's written.</em>
 </p>
-{% endfor %}
+
+
+      </section>
+      </div>
+
+      <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+      </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>

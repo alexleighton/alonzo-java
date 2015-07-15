@@ -1,31 +1,46 @@
----
-layout: null
----
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>{{ site.title | xml_escape }}</title>
-    <description>{{ site.description | xml_escape }}</description>
-    <link>{{ site.url }}{{ site.baseurl }}/</link>
-    <atom:link href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" rel="self" type="application/rss+xml"/>
-    <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
-    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
-    <generator>Jekyll v{{ jekyll.version }}</generator>
-    {% for post in site.posts limit:10 %}
+    <title>Alonzo</title>
+    <description>Alonzo is a Java software project to code a Lambda Calculus interpreter. Alongside the code lives this blog dedicated to writing and teaching about what goes into writing the interpreter, and interesting coding choices.
+</description>
+    <link>/alonzo-java/</link>
+    <atom:link href="/alonzo-java/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 15 Jul 2015 06:25:10 -0700</pubDate>
+    <lastBuildDate>Wed, 15 Jul 2015 06:25:10 -0700</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
       <item>
-        <title>{{ post.title | xml_escape }}</title>
-        <description>{{ post.content | xml_escape }}</description>
-        <pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
-        <link>{{ post.url | prepend: site.baseurl | prepend: site.url }}</link>
-        <guid isPermaLink="true">{{ post.url | prepend: site.baseurl | prepend: site.url }}</guid>
-        {% for tag in post.tags %}
-        <category>{{ tag | xml_escape }}</category>
-        {% endfor %}
-        {% for cat in post.categories %}
-        <category>{{ cat | xml_escape }}</category>
-        {% endfor %}
+        <title>Welcome &amp; Introduction</title>
+        <description>&lt;h2 id=&quot;welcome&quot;&gt;Welcome&lt;/h2&gt;
+
+&lt;p&gt;On this blog you will find posts that discuss the project. I will be detailing the design choices, highlighting interesting code, and generally helping anyone interested in the Lambda Calculus understand the language and how to write an interpreter for it.&lt;/p&gt;
+
+&lt;p&gt;We’ll be starting from scratch with this project. Partly to satisfy anyone’s curiosity about &lt;em&gt;all&lt;/em&gt; of the pieces, and partly because I detest the Java package managers I’ve run across. So, all bets are off — if we need it, we’ll build it.&lt;/p&gt;
+
+&lt;p&gt;Here are the things I’m taking for granted:&lt;/p&gt;
+
+&lt;h2 id=&quot;program-dependencies&quot;&gt;Program Dependencies&lt;/h2&gt;
+
+&lt;h3 id=&quot;make&quot;&gt;Make&lt;/h3&gt;
+
+&lt;p&gt;I am using the &lt;em&gt;old-as-the-hills&lt;/em&gt; Make for coordinating the building, testing, and cleaning of the project. Yes, I agree, there are better build tools out there. However, I think Make wins for simplicity and ubiquity. Not using a Java package manager means that all code will be in source rather than compiled format, so linking dependencies together can be left to javac.&lt;/p&gt;
+
+&lt;h3 id=&quot;java-8&quot;&gt;Java 8&lt;/h3&gt;
+
+&lt;p&gt;I am using the newest version of Java and the JDK because I want to get more familiar with the new semantics and libraries in Java 8 (yay first-class functions!). My other motivation for using Java is to show what it looks like to implement a functional language (the Lambda Calculus) in an imperative language. Often you’ll see folks implement a toy functional language in another functional language. Some people find this to be cheating in a way, as certain functional languages (OCaml, Haskell) seem better suited to constructing compilers and interpreters.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 12 Jul 2015 01:10:00 -0700</pubDate>
+        <link>/alonzo-java/misc/2015/07/12/welcome.html</link>
+        <guid isPermaLink="true">/alonzo-java/misc/2015/07/12/welcome.html</guid>
+        
+        <category>introduction</category>
+        
+        
+        <category>misc</category>
+        
       </item>
-    {% endfor %}
+    
   </channel>
 </rss>
 
