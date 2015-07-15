@@ -1,0 +1,16 @@
+---
+layout: default
+---
+<p>Alonzo is a Java software project to code a Lambda Calculus
+  interpreter. Alongside the code lives this blog dedicated to writing
+  and teaching about code that goes into the interpreter, and
+  interesting coding choices.</p>
+
+<h2>Blog Posts</h2>
+{% for post in site.posts %}
+<span style="float: right">{{ post.date | date: "%b %-d, %Y" }}</span>
+<h3 class="post-link"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+<p>
+  <em>{{ post.excerpt }}</em>
+</p>
+{% endfor %}
