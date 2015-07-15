@@ -3,7 +3,7 @@ description: >
   Alonzo is a Java software project to code a Lambda Calculus interpreter.
   Alongside the code lives this blog dedicated to writing and teaching about
   what goes into writing the interpreter, and interesting coding choices.
-baseurl: ""
+baseurl: "/alonzo-java"
 url: ""
 
 markdown: kramdown
