@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  {% include head.html %}
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+      <div class="wrapper">
+      {% include header.html %}
+
+      <section>
+        <div class="navbar-container">
+        <ul>
+          <li><a href="{{ "/about.html" | prepend: site.baseurl | prepend: site.url }}">About</a></li>
+          {% assign last_post = site.posts.first %}
+          <li class="ellipsize-overflow"><a href="{{ last_post.url | prepend: site.baseurl | prepend: site.url }}">Latest Post</a></li>
+        </ul>
+        </div>
+
+        {{ content }}
+      </section>
+      </div>
+
+      {% include footer.html %}
+      </div>
+    </div>
+    </div>
+    <script src="{{ "/js/scale.fix.js" | prepend: site.baseurl | prepend: site.url }}"></script>
+  </body>
+</html>

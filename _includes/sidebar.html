@@ -1,0 +1,14 @@
+<div class="wrapper">
+<header>
+  <h1><a href="{{ "/" | prepend: site.baseurl | prepend: site.url }}">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="{{ "/about.html" | prepend: site.baseurl | prepend: site.url }}">About</h3>
+  {% assign last_post = site.posts.first %}
+  <h3 class="ellipsize-overflow">
+    <a href="{{ last_post.url | prepend: site.baseurl | prepend: site.url }}">Latest Post &mdash; {{ last_post.title }}</a>
+  </h3>
+</section>
+</div>
