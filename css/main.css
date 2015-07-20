@@ -73,6 +73,13 @@ body {
   padding-right: 1.5em;
 }
 
+.github_sample_ref {
+    padding: 0;
+    margin: 0;
+    margin-top: -20px;
+    text-align: right;
+}
+
 header, section, footer {
   display: block;
 }
