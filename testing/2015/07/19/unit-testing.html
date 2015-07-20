@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • Unit Testing Framework Foundations</title>
+  <meta name="description" content="Minimal unit testing framework, driven from the top down.">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/testing/2015/07/19/unit-testing.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/testing/2015/07/19/unit-testing.html">Latest Post &mdash; Unit Testing Framework Foundations</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>Unit Testing Framework Foundations</h1>
+        <p>July 19, 2015 • Alex Leighton</p>
+        <p>tags: unit and testing</p>
+      </header>
+
+      <section>
+        <h2 id="testing">Testing</h2>
+
+<p>I’m a big fan of automated testing, for many reasons. It provides the easiest and most reliable way to see if your code is working, aside from strong static typing. Further, in my experience, driving interface design from the perspective of making it easy to test tends to make for good interfaces.</p>
+
+<p>In order to test our interpreter, it will be helpful to have a testing framework which will automate the process of running tests, and collecting and presenting test results. This isn’t strictly necessary, as we could just ad-hoc design our tests, with a <code>println</code> indicating success here and a <code>resultCode</code> indicating failure there. I think we’ll have more confidence in our results if they’re all delivered the same way, through the same testing mechanisms.</p>
+
+<p>Now if you’ve ever designed a testing framework, you’ll have quickly realized that like every other piece of software, having automated tests to ensure your testing framework still works is important. But we’ve got a bit of a quandary. Testing your testing framework seems valuable, but also like we’re getting into a “turtles all the way down” situation. At some point, you have to trust that the code you’re writing is correct. In our case, I started with a dumb test to be driven by the framework, essentially testing correctness of the testing framework manually.</p>
+
+<p>The first test:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FooTest</span> <span class="o">{</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">firstTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="k">new</span> <span class="nf">Foo</span><span class="o">().</span><span class="na">bar</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe//tst/alonzo/FooTest.java#L6-L12">/tst/alonzo/FooTest.java</a></small></p>
+
+<p>The call to the test runner:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">new</span> <span class="nf">TestRunner</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">withTest</span><span class="o">(</span><span class="n">FooTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">run</span><span class="o">();</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe//tst/alonzo/TestingMain.java#L7-L11">/tst/alonzo/TestingMain.java</a></small></p>
+
+<p>I started with these two classes before writing any of the testing framework code. In general, I believe in the value of test-driven development. Without going too much into TDD and its positives and negatives, here’s a benefit I’ve found from practicing TDD. Driving the code from a test usually results in a better, more usable interface. So, in this instance, I wrote the test the way I wanted to write a test, and wrote the code to run the test in a way that seemed easy to run tests. Honestly, this top-down thinking is one of the hardest things for new developers to really grok and practice. It is key in choosing your abstractions well and in writing interfaces that you actually would want to use.</p>
+
+<p>So far, the architecture of the testing framework is relatively simple. The <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/TestRunner.java"><code>TestRunner</code></a> collects tests, then runs them, collecting the <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/TestResult.java"><code>TestResults</code></a>, and finally displaying those results. In order to run the tests, the <code>TestRunner</code> makes use of the <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/RunnableTest.java"><code>RunnableTest</code></a> class, which does all the heavy lifting. It searches the class for any methods labeled with the <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/Test.java"><code>@Test</code></a> annotation, and the constructor. <code>RunnableTest</code> implements the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html"><code>Supplier&lt;TestResult&gt;</code></a> interface, by running the wrapped test and constructing a result. <code>RunnableTest</code> works in concert with the static methods in <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/Assert.java"><code>Assert</code></a> which throw <a href="https://github.com/alexleighton/alonzo-java/blob/add2fe75a054079bad27765233a1bd566d7a3ebe/tst/alonzo/unit/AssertionFailureException.java"><code>AssertionFailureException</code></a> to indicate a test failure.</p>
+
+<p>Now we have a testing framework with which to test the code we write for the interpreter.</p>
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>
