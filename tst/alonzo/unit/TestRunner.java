@@ -43,6 +43,8 @@ public class TestRunner {
             .filter(r -> r.isFailed()).collect(Collectors.toList());
         final List<TestResult> errored = results.stream()
             .filter(r -> r.isErrored()).collect(Collectors.toList());
+        final List<TestResult> ignored = results.stream()
+            .filter(r -> r.isIgnored()).collect(Collectors.toList());
 
         for (final TestResult result: failed) {
             System.out.println(String.format("Failed test \"%s\"", result.getTestName()));
@@ -59,9 +61,9 @@ public class TestRunner {
         final boolean overallFailure = failed.size() + errored.size() > 0;
 
         System.out.println(String.format(
-                "Test Results: %s\n%d Total [%d Passed, %d Failed, %d Errors]",
+                "Test Results: %s\n%d Total [%d Passed, %d Failed, %d Errors, %d Ignored]",
                 overallFailure ? "FAILURE" : "PASS",
-                results.size(), passed.size(), failed.size(), errored.size()));
+                results.size(), passed.size(), failed.size(), errored.size(), ignored.size()));
     }
 
 }

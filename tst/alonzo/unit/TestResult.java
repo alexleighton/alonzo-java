@@ -6,6 +6,7 @@ package alonzo.unit;
  * @see Passed
  * @see Failed
  * @see Errored
+ * @see Ignored
  */
 public abstract class TestResult {
 
@@ -24,8 +25,7 @@ public abstract class TestResult {
      * @param e        The assertion failure that caused the test to fail.
      * @return A Failed test result.
      */
-    public static Failed fail(final String testName, final AssertionFailureException e)
-    {
+    public static Failed fail(final String testName, final AssertionFailureException e) {
         return new Failed(testName, e);
     }
 
@@ -35,9 +35,17 @@ public abstract class TestResult {
      * @param cause    The Throwable that caused the test to error.
      * @return An Errored test result.
      */
-    public static Errored error(final String testName, final Throwable cause)
-    {
+    public static Errored error(final String testName, final Throwable cause) {
         return new Errored(testName, cause);
+    }
+
+    /**
+     * Construct an {@link Ignored} test result.
+     * @param testName The name of the test that was ignored.
+     * @return An Ignored test result.
+     */
+    public static Ignored ignore(final String testName) {
+        return new Ignored(testName);
     }
 
     private final String testName;
@@ -66,6 +74,11 @@ public abstract class TestResult {
         return this instanceof Errored;
     }
 
+    /** @return true if this is an {@link Ignored} result, false otherwise. */
+    public boolean isIgnored() {
+        return this instanceof Ignored;
+    }
+
     /** @return {@code this} casted to {@link Passed}. Safe if guarded by {@link #isPassed()}. */
     public Passed asPassed() {
         return (Passed) this;
@@ -79,6 +92,11 @@ public abstract class TestResult {
     /** @return {@code this} casted to {@link Errored}. Safe if guarded by {@link #isErrored()}. */
     public Errored asErrored() {
         return (Errored) this;
+    }
+
+    /** @return {@code this} casted to {@link Ignored}. Safe if guarded by {@link #isIgnored()}. */
+    public Ignored asIgnored() {
+        return (Ignored) this;
     }
 
     /**
@@ -121,6 +139,15 @@ public abstract class TestResult {
         /** @return The Throwable that caused a test to error. */
         public Throwable getCause() {
             return cause;
+        }
+    }
+
+    /**
+     * Objects representing an ignored test result for given tests.
+     */
+    public static class Ignored extends TestResult {
+        private Ignored(final String testName) {
+            super(testName);
         }
     }
 }

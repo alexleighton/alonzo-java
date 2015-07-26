@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import alonzo.exc.UnexpectedIssueException;
+
 /**
  * Container used for holding and running the objects necessary for a test.
  * @see TestRunner for the actual runner-of-tests.
@@ -62,18 +64,11 @@ public class RunnableTest implements Supplier<TestResult> {
      */
     @Override
     public TestResult get() {
-        final Object instance;
-        try {
-            instance = constructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException
-                 | IllegalArgumentException | InvocationTargetException e)
-        {
-            throw new IllegalStateException(
-                String.format("Could not create an instance of test class \"%s\". "
-                              + "Please consider filing an issue: "
-                              + "https://github.com/alexleighton/alonzo-java/issues",
-                              clazz.getName()), e);
+        if (isIgnoredTest()) {
+            return TestResult.ignore(testName);
         }
+
+        final Object instance = constructTestInstance();
 
         try {
             method.invoke(instance);
@@ -86,11 +81,23 @@ public class RunnableTest implements Supplier<TestResult> {
                 return TestResult.error(testName, e.getCause());
             }
         } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw new IllegalStateException(
-                    String.format("Could not invoke test method \"%s\". "
-                                  + "Please consider filing an issue: "
-                                  + "https://github.com/alexleighton/alonzo-java/issues",
-                                  testName), e);
+            throw new UnexpectedIssueException("Could not invoke test method \""
+                                               + testName + "\".", e);
+        }
+    }
+
+    private boolean isIgnoredTest() {
+        return method.getAnnotation(Ignore.class) != null;
+    }
+
+    private Object constructTestInstance() {
+        try {
+            return constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException
+                 | IllegalArgumentException | InvocationTargetException e)
+        {
+            throw new UnexpectedIssueException("Could not create an instance of test class \""
+                                               + clazz.getName() + "\".", e);
         }
     }
 
