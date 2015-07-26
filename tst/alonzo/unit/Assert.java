@@ -26,7 +26,16 @@ public class Assert {
     }
 
     private static String failureMessage(final Object expected, final Object actual) {
-        return "Expected <" + expected + ">, actual: <" + actual + ">";
+        return "Expected: <" + expected + ">, actual: <" + actual + ">";
+    }
+
+    /**
+     * Fails the current test, using the given message as the reason.
+     * @param message The reason the test failed.
+     * @throws AssertionFailureException with the given message.
+     */
+    public static void fail(final String message) {
+        throw new AssertionFailureException(message);
     }
 
 }
