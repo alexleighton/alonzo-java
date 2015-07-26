@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • Ignoring Tests</title>
+  <meta name="description" content="Incremental improvement: ignoring tests.">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/testing/2015/07/26/ignoring-tests.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/testing/2015/07/26/ignoring-tests.html">Latest Post &mdash; Ignoring Tests</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>Ignoring Tests</h1>
+        <p>July 26, 2015 • Alex Leighton</p>
+      </header>
+
+      <section>
+        <div class="commit">
+  <a href="https://github.com/alexleighton/alonzo-java/tree/fd9028f3c3841be02fa6d4b225d670a41cae8268">
+    This post is based on code found in <code>fd9028f3c38</code>
+  </a>
+</div>
+
+<p>In the course of making a formatter for our lambda calculus terms, I stumbled on a situation where the ability to ignore a test was needed. Let’s see how to add “ignored” tests to our testing framework.</p>
+
+<p>Similar to JUnit, I’ve added an <a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/Ignore.java"><code>@Ignore</code></a> annotation for marking tests as ignored. Next, we need to a new kind of TestResult:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Objects representing an ignored test result for given tests.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Ignored</span> <span class="kd">extends</span> <span class="n">TestResult</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nf">Ignored</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">testName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">testName</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/TestResult.java#L145-L152">/tst/alonzo/unit/TestResult.java</a></small></p>
+
+<p><a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/RunnableTest.java"><code>RunnableTest</code></a> needs to be changed in order to understand ignored tests. When making the change, I chose to not construct the test class instance or run the test method, opting for an early return with no work done. Further, as this addition made <a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/RunnableTest.java#L66"><code>RunnableTest.get()</code></a> too large for my taste, I refactored construction of the test class instance into a method.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">isIgnoredTest</span><span class="o">())</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">TestResult</span><span class="o">.</span><span class="na">ignore</span><span class="o">(</span><span class="n">testName</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">final</span> <span class="n">Object</span> <span class="n">instance</span> <span class="o">=</span> <span class="n">constructTestInstance</span><span class="o">();</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/RunnableTest.java#L67-L71">/tst/alonzo/unit/RunnableTest.java</a></small></p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isIgnoredTest</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">method</span><span class="o">.</span><span class="na">getAnnotation</span><span class="o">(</span><span class="n">Ignore</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/RunnableTest.java#L89-L91">/tst/alonzo/unit/RunnableTest.java</a></small></p>
+
+<p>Finally, at the top level of <a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/TestRunner.java#L35"><code>TestRunner</code></a>, all that’s needed is a simple collection of ignored test results and the addition of an ignored section in the overall result output.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">TestResult</span><span class="o">&gt;</span> <span class="n">ignored</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">isIgnored</span><span class="o">()).</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/TestRunner.java#L46-L47">/tst/alonzo/unit/TestRunner.java</a></small></p>
+
+<p>A good test of any software system is how easy it is to adjust the system incrementally. I’m pleased with how easy it was to adjust our testing framework in this way.</p>
+
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>

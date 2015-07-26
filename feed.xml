@@ -6,13 +6,81 @@
 </description>
     <link>/alonzo-java/</link>
     <atom:link href="/alonzo-java/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 19 Jul 2015 21:41:54 -0700</pubDate>
-    <lastBuildDate>Sun, 19 Jul 2015 21:41:54 -0700</lastBuildDate>
+    <pubDate>Sun, 26 Jul 2015 15:39:31 -0700</pubDate>
+    <lastBuildDate>Sun, 26 Jul 2015 15:39:31 -0700</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
+        <title>Ignoring Tests</title>
+        <description>&lt;div class=&quot;commit&quot;&gt;
+  &lt;a href=&quot;https://github.com/alexleighton/alonzo-java/tree/fd9028f3c3841be02fa6d4b225d670a41cae8268&quot;&gt;
+    This post is based on code found in &lt;code&gt;fd9028f3c38&lt;/code&gt;
+  &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the course of making a formatter for our lambda calculus terms, I stumbled on a situation where the ability to ignore a test was needed. Let’s see how to add “ignored” tests to our testing framework.&lt;/p&gt;
+
+&lt;p&gt;Similar to JUnit, I’ve added an &lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/Ignore.java&quot;&gt;&lt;code&gt;@Ignore&lt;/code&gt;&lt;/a&gt; annotation for marking tests as ignored. Next, we need to a new kind of TestResult:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * Objects representing an ignored test result for given tests.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; */&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Ignored&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TestResult&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Ignored&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;testName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/TestResult.java#L145-L152&quot;&gt;/tst/alonzo/unit/TestResult.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/RunnableTest.java&quot;&gt;&lt;code&gt;RunnableTest&lt;/code&gt;&lt;/a&gt; needs to be changed in order to understand ignored tests. When making the change, I chose to not construct the test class instance or run the test method, opting for an early return with no work done. Further, as this addition made &lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/RunnableTest.java#L66&quot;&gt;&lt;code&gt;RunnableTest.get()&lt;/code&gt;&lt;/a&gt; too large for my taste, I refactored construction of the test class instance into a method.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isIgnoredTest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TestResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ignore&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;constructTestInstance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/RunnableTest.java#L67-L71&quot;&gt;/tst/alonzo/unit/RunnableTest.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;isIgnoredTest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;method&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAnnotation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Ignore&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/RunnableTest.java#L89-L91&quot;&gt;/tst/alonzo/unit/RunnableTest.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, at the top level of &lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268/tst/alonzo/unit/TestRunner.java#L35&quot;&gt;&lt;code&gt;TestRunner&lt;/code&gt;&lt;/a&gt;, all that’s needed is a simple collection of ignored test results and the addition of an ignored section in the overall result output.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TestResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ignored&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;stream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isIgnored&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;collect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Collectors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/fd9028f3c3841be02fa6d4b225d670a41cae8268//tst/alonzo/unit/TestRunner.java#L46-L47&quot;&gt;/tst/alonzo/unit/TestRunner.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;A good test of any software system is how easy it is to adjust the system incrementally. I’m pleased with how easy it was to adjust our testing framework in this way.&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 26 Jul 2015 00:00:00 -0700</pubDate>
+        <link>/alonzo-java/testing/2015/07/26/ignoring-tests.html</link>
+        <guid isPermaLink="true">/alonzo-java/testing/2015/07/26/ignoring-tests.html</guid>
+        
+        <category>unit</category>
+        
+        <category>testing</category>
+        
+        
+        <category>testing</category>
+        
+      </item>
+    
+      <item>
         <title>Unit Testing Framework Foundations</title>
-        <description>&lt;h2 id=&quot;testing&quot;&gt;Testing&lt;/h2&gt;
+        <description>&lt;div class=&quot;commit&quot;&gt;
+  &lt;a href=&quot;https://github.com/alexleighton/alonzo-java/tree/add2fe75a054079bad27765233a1bd566d7a3ebe&quot;&gt;
+    This post is based on code found in &lt;code&gt;add2fe75a05&lt;/code&gt;
+  &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;testing&quot;&gt;Testing&lt;/h2&gt;
 
 &lt;p&gt;I’m a big fan of automated testing, for many reasons. It provides the easiest and most reliable way to see if your code is working, aside from strong static typing. Further, in my experience, driving interface design from the perspective of making it easy to test tends to make for good interfaces.&lt;/p&gt;
 
