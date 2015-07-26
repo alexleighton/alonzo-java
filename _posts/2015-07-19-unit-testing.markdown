@@ -7,6 +7,8 @@ tags:       unit testing
 layout:     post
 ---
 
+{% include commit.html ref="add2fe75a054079bad27765233a1bd566d7a3ebe" %}
+
 ## Testing
 
 I'm a big fan of automated testing, for many reasons. It provides the easiest and most reliable way to see if your code is working, aside from strong static typing. Further, in my experience, driving interface design from the perspective of making it easy to test tends to make for good interfaces.
