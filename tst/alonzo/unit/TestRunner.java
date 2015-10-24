@@ -48,13 +48,13 @@ public class TestRunner {
 
         for (final TestResult result: failed) {
             System.out.println(String.format("Failed test \"%s\"", result.getTestName()));
-            result.asFailed().getAssertionFailed().printStackTrace();
+            result.asFailed().getAssertionFailed().printStackTrace(System.out);
             System.out.println();
         }
 
         for (final TestResult result: errored) {
             System.out.println(String.format("Errored test \"%s\"", result.getTestName()));
-            result.asErrored().getCause().printStackTrace();
+            result.asErrored().getCause().printStackTrace(System.out);
             System.out.println();
         }
 
