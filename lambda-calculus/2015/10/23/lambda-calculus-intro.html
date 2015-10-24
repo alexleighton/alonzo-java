@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • Introduction to the Lambda Calculus</title>
+  <meta name="description" content="Defining the syntax of the Lambda Calculus, with a quick discussion of semantics.">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/lambda-calculus/2015/10/23/lambda-calculus-intro.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/lambda-calculus/2015/10/23/lambda-calculus-intro.html">Latest Post &mdash; Introduction to the Lambda Calculus</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>Introduction to the Lambda Calculus</h1>
+        <p>October 23, 2015 • Alex Leighton</p>
+      </header>
+
+      <section>
+        <div class="commit">
+  <a href="https://github.com/alexleighton/alonzo-java/tree/989223b15bb40f8a7461019a31469752a11ea9bf">
+    This post is based on code found in <code>989223b15bb</code>
+  </a>
+</div>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Lambda_calculus">Lambda Calculus</a> (λ-calculus) is a theoretical programming language originally used as part of an investigation into the foundations of mathematics. <a href="https://en.wikipedia.org/wiki/Alonzo_Church">Alonzo Church</a> (the namesake of this project) later published a paper on just the computational part of the λ-calculus. Our project here is to implement a full-featured interpreter for this simple programming language.</p>
+
+<h2 id="syntax">Syntax</h2>
+
+<p>The λ-calculus has a very simple syntax, making it a great first programming language to implement. There are only 3 forms in the expression-based syntax:</p>
+
+<pre><code>&lt;expr&gt; ::= &lt;var&gt; | &lt;function-definition&gt; | &lt;function-application&gt;
+
+&lt;function-definition&gt; ::= '(λ' &lt;var&gt; '.' &lt;expr&gt; ')'
+
+&lt;function-application&gt; ::= '(' &lt;expr&gt; ' ' &lt;expr&gt; ')'
+
+&lt;var&gt; ::= [^()λ. ]+
+</code></pre>
+
+<p>This basic <a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form">BNF</a> description of the syntax can be read as an expression is defined as the following 3 forms. First, an expression can be a <code>&lt;var&gt;</code>, which is defined as a series of characters not including any of <code>'('</code>, <code>')'</code>, <code>'λ'</code>, <code>'.'</code>, or <code>' '</code>. Second, an expression can be a <code>&lt;function-definition&gt;</code>, which consists of the characters <code>'(λ'</code>, followed by a <code>&lt;var&gt;</code>, followed by the character <code>'.'</code>, followed by an <code>&lt;expr&gt;</code>, followed by the character <code>')'</code>. Lastly, an expression can be a <code>&lt;function-application&gt;</code>, which consists of the character <code>'('</code>, followed by an <code>&lt;expr&gt;</code>, followed by the character <code>' '</code>, followed by an <code>&lt;expr&gt;</code>, followed by the character <code>')'</code>.</p>
+
+<p>This definition comprises the entirety of the syntax of the language. When we get to defining the parser for this language, we will very likely extend this definition to include whitespace between many of the syntax pieces, as extra whitespace enhances readability for humans. For now though, this definition will suffice for giving you a feeling for the different forms the language can take.</p>
+
+<h3 id="variable-reference">Variable Reference</h3>
+
+<p>A λ-calculus variable reference is similar in nature to the variable references you are used to in more mainstream programming languages. Like Java for instance:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">varName</span> <span class="o">=</span> <span class="mi">5</span><span class="o">;</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Value = &quot;</span> <span class="o">+</span> <span class="n">varName</span><span class="o">);</span></code></pre></div>
+
+<p>In the code example above, we see the assignment of the value <code>5</code> to the variable <code>varName</code>, and then a reference to the variable on the next line where <code>varName</code> is concatenated to the string <code>"Value = "</code>. Like the second line in the Java example, a variable reference syntax form indicates a reference to a variable that was defined “previously” in the λ-calculus program.</p>
+
+<p>We represent a λ-calculus variable like so:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Variable reference. An {@link ASTNode} representing a referenced variable.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Var</span> <span class="kd">extends</span> <span class="n">ASTNode</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Var</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">name</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/989223b15bb40f8a7461019a31469752a11ea9bf//src/alonzo/ast/Var.java#L3-L18">/src/alonzo/ast/Var.java</a></small></p>
+
+<p>Our <code>Var</code> has a container for the textual name of the variable, and a way of accessing that name. A key implementation detail here is that I’ve made <code>Var</code> an immutable object, in order to allow referencing the object anywhere (even appearing multiple times in the same tree).</p>
+
+<h3 id="function-definition">Function Definition</h3>
+
+<p>The Lambda Calculus gets its name from the lambda (λ) symbol in the definition of a function. This is also where many mainstream functions get the name <code>lambda</code> for referring to an anonymous-function-as-a-value. Functions in the λ-calculus are a simplified version of the functions you are used to in other languages. These functions only have one parameter, with the body of the function being another expression. Simplicity is the reason for the season with the λ-calculus.</p>
+
+<p>Multi-parameter functions can be simulated: <code>int foo(int x, int y, int z) { return z; }</code> becomes <code>(λx.(λy.(λz.z)))</code> in the λ-calculus. As can be seen in the example, λ-calculus functions are anonymous (not named), and a function of three parameters is instead a function of one parameter, returning a function of one parameter, returning a function of one parameter, returning the final result.</p>
+
+<p>We represent a λ-calculus function as an immutable container for the <code>Var</code> parameter, and the <code>ASTNode</code> body:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Function definition. An {@link ASTNode} representing the definition of a function with one</span>
+<span class="cm"> * parameter.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Fun</span> <span class="kd">extends</span> <span class="n">ASTNode</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Var</span> <span class="n">parameter</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">body</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Fun</span><span class="o">(</span><span class="kd">final</span> <span class="n">Var</span> <span class="n">parameter</span><span class="o">,</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">body</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">parameter</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">body</span> <span class="o">=</span> <span class="n">body</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Var</span> <span class="nf">parameter</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">parameter</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">ASTNode</span> <span class="nf">body</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">body</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/989223b15bb40f8a7461019a31469752a11ea9bf//src/alonzo/ast/Fun.java#L3-L24">/src/alonzo/ast/Fun.java</a></small></p>
+
+<h3 id="function-application">Function Application</h3>
+
+<p>Function application is the third form a λ-calculus expression can take. It represents the application of a function to one argument. In Java this looks like <code>someFunction(someArgument)</code>. In the λ-calculus it looks like <code>(someFunction someArgument)</code>. For the sake of removing ambiguity, the application is parenthesized, as “<code>expr1 expr2 expr3</code>” could mean <code>expr3</code> is the argument to <code>expr2</code> and the result is the argument to <code>expr1</code>.</p>
+
+<p>We represent a λ-calculus function application as an immutable container for the <code>ASTNode</code> function, and the <code>ASTNode</code> argument:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Function application. An {@link ASTNode} representing the application of a function to one</span>
+<span class="cm"> * argument.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">App</span> <span class="kd">extends</span> <span class="n">ASTNode</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">function</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">argument</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">App</span><span class="o">(</span><span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">function</span><span class="o">,</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">argument</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">function</span> <span class="o">=</span> <span class="n">function</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">argument</span> <span class="o">=</span> <span class="n">argument</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">ASTNode</span> <span class="nf">function</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">function</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">ASTNode</span> <span class="nf">argument</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">argument</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/989223b15bb40f8a7461019a31469752a11ea9bf//src/alonzo/ast/App.java#L3-L25">/src/alonzo/ast/App.java</a></small></p>
+
+<p>The reason both the left and right sides of the application are <code>ASTNode</code>s is that, due to the semantics of the language, the left side may only become a function through runtime interpretation of the program.</p>
+
+<h2 id="semantics">Semantics</h2>
+
+<p>Computation in the λ-calculus is achieved through variable substitution and structural interpretation of the resulting functions. What I mean here is that computation is performed by substituting expressions for variables where possible until there are no more substitutions possible, and then inspecting the resulting expression structure to get an “answer”. We’ll talk more about the semantics of the language once it’s time to implement evaluation. For now, here’s an example program and the result of evaluating it:</p>
+
+<pre><code>((λn.(λf.(λx.(n ((n f) x))))) (λf.(λx.x)))
+</code></pre>
+<p>evaluates to:</p>
+
+<pre><code>(λf.(λx.(f x)))
+</code></pre>
+
+<p>Here, we see the “successor” function <code>(λn.(λf.(λx.(n ((n f) x)))))</code> given the argument <code>(λf.(λx.x))</code>, the number 0. The result <code>(λf.(λx.(f x)))</code> is the number 1. Don’t stress out too much on how these particular representations of <code>+1</code> and <code>0</code> were picked, just learn from this as a real-world example of a small λ-calculus program. We will cover these representations and evaluation strategies later. Suffice it to say that we take the <code>0</code> function and substitute it in the <code>+1</code> function everywhere the parameter <code>n</code> is, and continue substituting until we get <code>1</code>.</p>
+
+<p>To be continued…</p>
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>
