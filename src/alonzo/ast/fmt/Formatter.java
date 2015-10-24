@@ -41,8 +41,8 @@ public abstract class Formatter {
         try {
             format(out, root);
         } catch (IOException e) {
-            throw new UnexpectedIssueException("This shouldn't happen, as ByteArrayOutputStream "
-                                               + "shouldn't throw IOException.", e);
+            throw new UnexpectedIssueException(
+                "This shouldn't happen, as ByteArrayOutputStream shouldn't throw IOException.", e);
         }
 
         return new String(out.toByteArray(), charset);

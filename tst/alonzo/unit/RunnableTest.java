@@ -81,8 +81,7 @@ public class RunnableTest implements Supplier<TestResult> {
                 return TestResult.error(testName, e.getCause());
             }
         } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw new UnexpectedIssueException("Could not invoke test method \""
-                                               + testName + "\".", e);
+            throw new UnexpectedIssueException(e, "Could not invoke test method \"%s\".", testName);
         }
     }
 
@@ -96,8 +95,8 @@ public class RunnableTest implements Supplier<TestResult> {
         } catch (InstantiationException | IllegalAccessException
                  | IllegalArgumentException | InvocationTargetException e)
         {
-            throw new UnexpectedIssueException("Could not create an instance of test class \""
-                                               + clazz.getName() + "\".", e);
+            throw new UnexpectedIssueException(e,
+                "Could not create an instance of test class \"%s\".", clazz.getName());
         }
     }
 

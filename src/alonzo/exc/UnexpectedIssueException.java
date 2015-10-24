@@ -13,10 +13,14 @@ public class UnexpectedIssueException extends RuntimeException {
     private static final long serialVersionUID = 9120629908786986083L;
 
     private static final String ISSUES_MESSAGE =
-        " Please consider filing an issue: https://github.com/alexleighton/alonzo-java/issues";
+        " [Please consider filing an issue: https://github.com/alexleighton/alonzo-java/issues]";
 
-    public UnexpectedIssueException(String msg) {
-        super(msg + ISSUES_MESSAGE);
+    public UnexpectedIssueException(String fmtString, Object... args) {
+        this(null, fmtString, args);
+    }
+
+    public UnexpectedIssueException(Exception exc, String fmtString, Object... args) {
+        this(String.format(fmtString, args), exc);
     }
 
     public UnexpectedIssueException(String msg, Exception exc) {

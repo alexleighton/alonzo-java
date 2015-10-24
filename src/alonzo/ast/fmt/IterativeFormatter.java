@@ -67,7 +67,7 @@ public class IterativeFormatter extends Formatter {
         case ASTContext.AFTER_BODY:
             out.write(bytes(")"));
             break;
-        default: throw new UnexpectedIssueException("Unexpected state: \"" + state + "\".");
+        default: throw new UnexpectedIssueException("Unexpected state: \"%s\".", state);
         }
     }
 
@@ -91,7 +91,7 @@ public class IterativeFormatter extends Formatter {
         case ASTContext.AFTER_RIGHT:
             out.write(bytes(")"));
             break;
-        default: throw new UnexpectedIssueException("Unexpected status: \"" + state + "\".");
+        default: throw new UnexpectedIssueException("Unexpected status: \"%s\".", state);
         }
     }
 
