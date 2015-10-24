@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import alonzo.ast.ASTNode;
+import alonzo.common.Validate;
 import alonzo.exc.UnexpectedIssueException;
 
 /**
@@ -19,7 +20,7 @@ public abstract class Formatter {
     private final Charset charset;
 
     public Formatter(final Charset charset) {
-        this.charset = charset;
+        this.charset = Validate.notNull(charset, "null charset");
     }
 
     /**
