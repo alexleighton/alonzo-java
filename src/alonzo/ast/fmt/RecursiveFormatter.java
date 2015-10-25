@@ -24,15 +24,15 @@ public class RecursiveFormatter extends Formatter {
 
     @Override
     public void format(final OutputStream out, final ASTNode root) throws IOException {
-        if (root instanceof Var) {
+        if (root.isVar()) {
             out.write(bytes(((Var) root).name()));
         }
 
-        if (root instanceof Fun) {
+        if (root.isFun()) {
             formatFun(out, (Fun) root);
         }
 
-        if (root instanceof App) {
+        if (root.isApp()) {
             formatApp(out, (App) root);
         }
     }

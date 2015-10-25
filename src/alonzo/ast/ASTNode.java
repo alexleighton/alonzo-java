@@ -8,4 +8,16 @@ package alonzo.ast;
  */
 public abstract class ASTNode {
 
+    public boolean isVar() {
+        return this instanceof Var;
+    }
+
+    public boolean isFun() {
+        return this instanceof Fun;
+    }
+
+    public boolean isApp() {
+        return this instanceof App;
+    }
+
 }

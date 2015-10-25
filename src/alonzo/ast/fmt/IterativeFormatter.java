@@ -33,15 +33,15 @@ public class IterativeFormatter extends Formatter {
         while (!contexts.isEmpty()) {
             final ASTContext ctx = contexts.pop();
 
-            if (ctx.node() instanceof Var) {
+            if (ctx.node().isVar()) {
                 out.write(bytes(((Var) ctx.node()).name()));
             }
 
-            if (ctx.node() instanceof Fun) {
+            if (ctx.node().isFun()) {
                 formatFun(out, contexts, (Fun) ctx.node(), ctx.state());
             }
 
-            if (ctx.node() instanceof App) {
+            if (ctx.node().isApp()) {
                 formatApp(out, contexts, (App) ctx.node(), ctx.state());
             }
         }
