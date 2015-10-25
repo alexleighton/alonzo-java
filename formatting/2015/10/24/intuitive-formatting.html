@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • An Intuitive Formatter</title>
+  <meta name="description" content="Implementing a formatter/pretty-printer for the syntax we've defined.">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/formatting/2015/10/24/intuitive-formatting.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/formatting/2015/10/24/intuitive-formatting.html">Latest Post &mdash; An Intuitive Formatter</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>An Intuitive Formatter</h1>
+        <p>October 24, 2015 • Alex Leighton</p>
+      </header>
+
+      <section>
+        <div class="commit">
+  <a href="https://github.com/alexleighton/alonzo-java/tree/1f0b04e71923642f3b8d654390591970c7632d57">
+    This post is based on code found in <code>1f0b04e7192</code>
+  </a>
+</div>
+
+<p>One of the first things I do when I define the syntax for a new language is implement a formatter — code to produce a textual representation of expressions in the language. Humans are intensely visual, so having a way to look at the structures you are constructing in code is a great way of aiding understanding. Further, since this a programming language we’re creating, the ability to print expressions is necessary for the interpreter. If you haven’t read <a href="/alonzo-java/lambda-calculus/2015/10/23/lambda-calculus-intro.html">yesterday’s post</a> and are unfamiliar with the lambda calculus, I recommend reading it before proceeding.</p>
+
+<h2 id="formatting">Formatting</h2>
+
+<p>The interface our formatter needs to implement is as follows: given an <a href="https://docs.oracle.com/javase/8/docs/api/java/io/OutputStream.html"><code>OutputStream</code></a>, output a string representation of the given <a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57/src/alonzo/ast/ASTNode.java"><code>ASTNode</code></a>.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Format the given {@code ASTNode}, outputting to the given {@code OutputStream}. All character</span>
+<span class="cm"> * data is formatted to {@code out} using the {@link Charset} this object was constructed with.</span>
+<span class="cm"> * @param out  The {@code OutputStream} to format {@code root} to.</span>
+<span class="cm"> * @param root The {@code ASTNode} to format.</span>
+<span class="cm"> * @throws IOException if {@code out} had an issue being written to.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">format</span><span class="o">(</span><span class="kd">final</span> <span class="n">OutputStream</span> <span class="n">out</span><span class="o">,</span> <span class="kd">final</span> <span class="n">ASTNode</span> <span class="n">root</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//src/alonzo/ast/fmt/Formatter.java#L26-L33">/src/alonzo/ast/fmt/Formatter.java</a></small></p>
+
+<h2 id="formatting-var">Formatting Var</h2>
+
+<p>Remember that the definition of a variable (<a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57/src/alonzo/ast/Var.java"><code>Var</code></a>) is a sequence of characters, not including the punctuation used for other expression types:</p>
+
+<pre><code>&lt;var&gt; ::= [^()λ. ]+
+</code></pre>
+
+<p>The test for our formatter is likewise simple. When we have a variable containing a name, the string representation should just be the name. <small>For now, ignore that we’re testing 2 different formatters here, this post only concerns the recursive formatter.</small></p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="nd">@Test</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">fmtVar</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Var</span> <span class="n">v</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;testVariableName&quot;</span><span class="o">);</span>
+
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;testVariableName&quot;</span><span class="o">,</span> <span class="n">iterFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">v</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;testVariableName&quot;</span><span class="o">,</span> <span class="n">recFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">v</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/ast/fmt/FormatterTest.java#L19-L25">/tst/alonzo/ast/fmt/FormatterTest.java</a></small></p>
+
+<p>Given the quite simple definition of <code>Var</code>, formatting it is a one-liner:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="k">instanceof</span> <span class="n">Var</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(((</span><span class="n">Var</span><span class="o">)</span> <span class="n">root</span><span class="o">).</span><span class="na">name</span><span class="o">()));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//src/alonzo/ast/fmt/RecursiveFormatter.java#L27-L29">/src/alonzo/ast/fmt/RecursiveFormatter.java</a></small></p>
+
+<h2 id="formatting-fun">Formatting Fun</h2>
+
+<p>Formatting functions is a bit more tricky than formatting variables. Notice the recursive definition of a function as being an expression that contains another expression:</p>
+
+<pre><code>&lt;function-definition&gt; ::= '(λ' &lt;var&gt; '.' &lt;expr&gt; ')'
+</code></pre>
+
+<p>But first, the test. Straightforward, as usual:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="nd">@Test</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">fmtFun</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Fun</span> <span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Fun</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;var&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;body&quot;</span><span class="o">));</span>
+
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;(λvar.body)&quot;</span><span class="o">,</span> <span class="n">iterFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">f</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;(λvar.body)&quot;</span><span class="o">,</span> <span class="n">recFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">f</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/ast/fmt/FormatterTest.java#L27-L33">/tst/alonzo/ast/fmt/FormatterTest.java</a></small></p>
+
+<p>The recursive definition of <a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57/src/alonzo/ast/Fun.java"><code>Fun</code></a> makes defining the formatter in a recursive manner a really natural and intuitive choice. So, to format a function, we output the punctuation of the function, then recursively call format on the substructures: the parameter and the body of the function:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kt">void</span> <span class="nf">formatFun</span><span class="o">(</span><span class="kd">final</span> <span class="n">OutputStream</span> <span class="n">out</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Fun</span> <span class="n">fun</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot;(λ&quot;</span><span class="o">));</span>
+    <span class="n">format</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">fun</span><span class="o">.</span><span class="na">parameter</span><span class="o">());</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot;.&quot;</span><span class="o">));</span>
+    <span class="n">format</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">fun</span><span class="o">.</span><span class="na">body</span><span class="o">());</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot;)&quot;</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//src/alonzo/ast/fmt/RecursiveFormatter.java#L40-L46">/src/alonzo/ast/fmt/RecursiveFormatter.java</a></small></p>
+
+<h2 id="formatting-app">Formatting App</h2>
+
+<p>Function application (<a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57/src/alonzo/ast/App.java"><code>App</code></a>) is formatted in much the same way function was. Again, <code>App</code> is recursively defined as being composed of other expressions:</p>
+
+<pre><code>&lt;function-application&gt; ::= '(' &lt;expr&gt; ' ' &lt;expr&gt; ')'
+</code></pre>
+
+<p>The test for formatting <code>App</code> makes use of all the other <code>ASTNode</code>s, asking the formatter to format an application of the identity function to a free variable <code>y</code>.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="nd">@Test</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">fmtApp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">App</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">App</span><span class="o">(</span><span class="k">new</span> <span class="nf">Fun</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">)),</span> <span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;y&quot;</span><span class="o">));</span>
+
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;((λx.x) y)&quot;</span><span class="o">,</span> <span class="n">iterFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">a</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;((λx.x) y)&quot;</span><span class="o">,</span> <span class="n">recFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">a</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/ast/fmt/FormatterTest.java#L35-L41">/tst/alonzo/ast/fmt/FormatterTest.java</a></small></p>
+
+<p>The implementation is very similar to <code>Fun</code>, outputting the relevant punctuation, then recursively calling format on the function and argument substructures.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kt">void</span> <span class="nf">formatApp</span><span class="o">(</span><span class="kd">final</span> <span class="n">OutputStream</span> <span class="n">out</span><span class="o">,</span> <span class="kd">final</span> <span class="n">App</span> <span class="n">app</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot;(&quot;</span><span class="o">));</span>
+    <span class="n">format</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">app</span><span class="o">.</span><span class="na">function</span><span class="o">());</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">));</span>
+    <span class="n">format</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">app</span><span class="o">.</span><span class="na">argument</span><span class="o">());</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">(</span><span class="s">&quot;)&quot;</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//src/alonzo/ast/fmt/RecursiveFormatter.java#L48-L54">/src/alonzo/ast/fmt/RecursiveFormatter.java</a></small></p>
+
+<h2 id="putting-it-all-together">Putting It All Together</h2>
+
+<p>With all the pieces of <a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//src/alonzo/ast/fmt/RecursiveFormatter.java"><code>RecursiveFormatter</code></a> together, we can format arbitrarily complicated lambda calculus expressions. I’ve added a “complicated” test to the suite showing that our formatter can format the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus">Y-combinator</a>:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="nd">@Test</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">fmtComplicated</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Fun</span> <span class="n">sub</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Fun</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">App</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;f&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">App</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">))));</span>
+    <span class="kd">final</span> <span class="n">Fun</span> <span class="n">ycombinator</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Fun</span><span class="o">(</span><span class="k">new</span> <span class="nf">Var</span><span class="o">(</span><span class="s">&quot;f&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="nf">App</span><span class="o">(</span><span class="n">sub</span><span class="o">,</span> <span class="n">sub</span><span class="o">));</span>
+
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;(λf.((λx.(f (x x))) (λx.(f (x x)))))&quot;</span><span class="o">,</span> <span class="n">iterFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">ycombinator</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;(λf.((λx.(f (x x))) (λx.(f (x x)))))&quot;</span><span class="o">,</span> <span class="n">recFmt</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">ycombinator</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/ast/fmt/FormatterTest.java#L43-L50">/tst/alonzo/ast/fmt/FormatterTest.java</a></small></p>
+
+<p><em><strong>Next time on Alonzo</strong></em>: they taught you not to use recursion in Java; what to do when your stack gets blown?<br />
+Stay tuned to find out.</p>
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>
