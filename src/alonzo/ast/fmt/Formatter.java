@@ -12,6 +12,8 @@ import alonzo.exc.UnexpectedIssueException;
 
 /**
  * Abstract superclass of any {@link ASTNode} formatters.
+ * @see RecursiveFormatter
+ * @see IterativeFormatter
  */
 public abstract class Formatter {
 
@@ -19,7 +21,7 @@ public abstract class Formatter {
 
     private final Charset charset;
 
-    public Formatter(final Charset charset) {
+    protected Formatter(final Charset charset) {
         this.charset = Validate.notNull(charset, "null charset");
     }
 
@@ -34,13 +36,14 @@ public abstract class Formatter {
 
     /**
      * @return a formatted string of the given {@link ASTNode} root node.
+     * @see #format(OutputStream, ASTNode)
      */
     public String format(final ASTNode root) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
             format(out, root);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UnexpectedIssueException(
                 "This shouldn't happen, as ByteArrayOutputStream shouldn't throw IOException.", e);
         }
