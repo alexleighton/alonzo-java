@@ -12,11 +12,18 @@
     <div class="col-md-8">
     <div class="wrapper">
       <header>
-        <h1>{{ page.title }}</h1>
+        <h1>{{ page.title }}{% if page.brief %} <span style="float: right" class="tag">Brief</span>{% endif %}</h1>
         <p>{{ page.date | date: "%B %-d, %Y" }} • Alex Leighton</p>
       </header>
 
       <section>
+        {% if page.commit %}
+        <div class="commit">
+          <a href="https://github.com/alexleighton/alonzo-java/commit/{{ page.commit }}">
+            This post is based on code found in commit <code>{{ page.commit | truncate: 11, '' }}</code>
+          </a>
+        </div>
+        {% endif %}
         {{ content }}
       </section>
     </div>
