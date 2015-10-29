@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • Validate.notNull</title>
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/brief/2015/10/27/validate-not-null.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/brief/2015/10/27/validate-not-null.html">Latest Post &mdash; Validate.notNull</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>Validate.notNull <span style="float: right" class="tag">Brief</span></h1>
+        <p>October 27, 2015 • Alex Leighton</p>
+      </header>
+
+      <section>
+        
+        <div class="commit">
+          <a href="https://github.com/alexleighton/alonzo-java/commit/a9f345db226c3f434487495b58d8a24fd378f007">
+            This post is based on code found in commit <code>a9f345db226</code>
+          </a>
+        </div>
+        
+        <p>I’ve added a utility class for Validating preconditions, heavily inspired by the <a href="https://commons.apache.org/proper/commons-lang/javadocs/api-3.4/org/apache/commons/lang3/Validate.html#notNull(T,%20java.lang.String,%20java.lang.Object...)"><code>Validate</code></a> class found in <a href="https://commons.apache.org/proper/commons-lang/">Apache Commons</a>.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * Throws {@link NullPointerException} if the given object is null, returning the given object</span>
+<span class="cm"> * if it is not null. The thrown NullPointerException will contain a message created by passing</span>
+<span class="cm"> * msg and args to {@link String#format(String, Object...)}.</span>
+<span class="cm"> * @param obj The object to check against null.</span>
+<span class="cm"> * @param msg The format string to use as the exception message if obj is null.</span>
+<span class="cm"> * @param args The arguments to msg for use if obj is null.</span>
+<span class="cm"> * @return obj if it is not null.</span>
+<span class="cm"> * @throws NullPointerException if obj is null.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">notNull</span><span class="o">(</span><span class="kd">final</span> <span class="n">T</span> <span class="n">obj</span><span class="o">,</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">msg</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Object</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">obj</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">NullPointerException</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">msg</span><span class="o">,</span> <span class="n">args</span><span class="o">));</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">obj</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/a9f345db226c3f434487495b58d8a24fd378f007//src/alonzo/common/Validate.java#L12-L27">/src/alonzo/common/Validate.java</a></small></p>
+
+<p>Semantic correctness is an important part of software design for me. I use strong typing because it’s a cheap (cheaper than finding them at runtime) way of discovering and preventing bugs. In keeping with this ideology, I believe in failing fast. Discovering a bug or error during the running of a program as soon as it appears makes debugging easier (due to quicker root-causing). Ensuring that objects are constructed correctly or that objects to be used abide by expectations makes writing logic around them easier.</p>
+
+<p>I use Validate to ensure that expected preconditions hold, or else fail immediately. Typically I will use Validate assertions to guarantee that an object is correct on construction, or else fail construction. This makes it harder to pass around broken objects, another aspect of failing fast. So far I’ve only needed to check for null. However, it is highly likely that I will be adding to this class in the future.</p>
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>

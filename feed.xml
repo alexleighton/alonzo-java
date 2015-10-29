@@ -6,9 +6,49 @@
 </description>
     <link>/alonzo-java/</link>
     <atom:link href="/alonzo-java/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 24 Oct 2015 19:04:54 -0700</pubDate>
-    <lastBuildDate>Sat, 24 Oct 2015 19:04:54 -0700</lastBuildDate>
+    <pubDate>Thu, 29 Oct 2015 07:07:30 -0700</pubDate>
+    <lastBuildDate>Thu, 29 Oct 2015 07:07:30 -0700</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Validate.notNull</title>
+        <description>&lt;p&gt;I’ve added a utility class for Validating preconditions, heavily inspired by the &lt;a href=&quot;https://commons.apache.org/proper/commons-lang/javadocs/api-3.4/org/apache/commons/lang3/Validate.html#notNull(T,%20java.lang.String,%20java.lang.Object...)&quot;&gt;&lt;code&gt;Validate&lt;/code&gt;&lt;/a&gt; class found in &lt;a href=&quot;https://commons.apache.org/proper/commons-lang/&quot;&gt;Apache Commons&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;cm&quot;&gt;/**&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * Throws {@link NullPointerException} if the given object is null, returning the given object&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * if it is not null. The thrown NullPointerException will contain a message created by passing&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * msg and args to {@link String#format(String, Object...)}.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * @param obj The object to check against null.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * @param msg The format string to use as the exception message if obj is null.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * @param args The arguments to msg for use if obj is null.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * @return obj if it is not null.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; * @throws NullPointerException if obj is null.&lt;/span&gt;
+&lt;span class=&quot;cm&quot;&gt; */&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;notNull&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;NullPointerException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/a9f345db226c3f434487495b58d8a24fd378f007//src/alonzo/common/Validate.java#L12-L27&quot;&gt;/src/alonzo/common/Validate.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;Semantic correctness is an important part of software design for me. I use strong typing because it’s a cheap (cheaper than finding them at runtime) way of discovering and preventing bugs. In keeping with this ideology, I believe in failing fast. Discovering a bug or error during the running of a program as soon as it appears makes debugging easier (due to quicker root-causing). Ensuring that objects are constructed correctly or that objects to be used abide by expectations makes writing logic around them easier.&lt;/p&gt;
+
+&lt;p&gt;I use Validate to ensure that expected preconditions hold, or else fail immediately. Typically I will use Validate assertions to guarantee that an object is correct on construction, or else fail construction. This makes it harder to pass around broken objects, another aspect of failing fast. So far I’ve only needed to check for null. However, it is highly likely that I will be adding to this class in the future.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 27 Oct 2015 00:00:00 -0700</pubDate>
+        <link>/alonzo-java/brief/2015/10/27/validate-not-null.html</link>
+        <guid isPermaLink="true">/alonzo-java/brief/2015/10/27/validate-not-null.html</guid>
+        
+        <category>brief</category>
+        
+        <category>preconditions</category>
+        
+        
+        <category>brief</category>
+        
+      </item>
     
       <item>
         <title>An Intuitive Formatter</title>
