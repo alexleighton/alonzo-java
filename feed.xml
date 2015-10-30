@@ -6,9 +6,33 @@
 </description>
     <link>/alonzo-java/</link>
     <atom:link href="/alonzo-java/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 29 Oct 2015 07:07:30 -0700</pubDate>
-    <lastBuildDate>Thu, 29 Oct 2015 07:07:30 -0700</lastBuildDate>
+    <pubDate>Fri, 30 Oct 2015 00:00:23 -0700</pubDate>
+    <lastBuildDate>Fri, 30 Oct 2015 00:00:23 -0700</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Format-String All the Things!</title>
+        <description>&lt;p&gt;I’ve picked up a practice recently: any time I need to provide a message (typically for errors or logging), I make sure the function in question takes &lt;code&gt;varargs&lt;/code&gt; and then pass them to &lt;a href=&quot;http://docs.oracle.com/javase/8/docs/api/java/lang/String.html#format-java.lang.String-java.lang.Object...-&quot;&gt;&lt;code&gt;String.format&lt;/code&gt;&lt;/a&gt;. Most of the time I provide a message, I eventually want to use a format-string and it’s just lame to have to call &lt;code&gt;String.format&lt;/code&gt; every time.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;UnexpectedIssueException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Could not invoke test method \&amp;quot;%s\&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;testName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p class=&quot;github_sample_ref&quot;&gt;&lt;small&gt;&lt;a href=&quot;https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/unit/RunnableTest.java#L84-L84&quot;&gt;/tst/alonzo/unit/RunnableTest.java&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 29 Oct 2015 00:00:00 -0700</pubDate>
+        <link>/alonzo-java/brief/2015/10/29/format-strings.html</link>
+        <guid isPermaLink="true">/alonzo-java/brief/2015/10/29/format-strings.html</guid>
+        
+        <category>brief</category>
+        
+        <category>format-strings</category>
+        
+        <category>exceptions</category>
+        
+        
+        <category>brief</category>
+        
+      </item>
     
       <item>
         <title>Validate.notNull</title>

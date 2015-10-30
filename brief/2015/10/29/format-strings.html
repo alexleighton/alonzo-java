@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Alonzo • Format-String All the Things!</title>
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="/alonzo-java/css/main.css">
+  <link rel="stylesheet" href="/alonzo-java/css/grid.css">
+  <link rel="stylesheet" href="/alonzo-java/css/pygment_trac.css">
+  <link rel="canonical" href="/alonzo-java/brief/2015/10/29/format-strings.html">
+  <link rel="alternate" type="application/rss+xml" title="Alonzo" href="/alonzo-java/feed.xml" />
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+  <body>
+
+    <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="wrapper">
+<header>
+  <h1><a href="/alonzo-java/">Alonzo</a></h1>
+  <p>A Lambda Calculus intepreter in Java</p>
+  <p class="show-small"><a href="https://github.com/alexleighton/alonzo-java">View the Project on GitHub <small>alexleighton/alonzo-java</small></a></p>
+</header>
+<section class="show-large">
+  <h3><a href="/alonzo-java/about.html">About</h3>
+  
+  <h3 class="ellipsize-overflow">
+    <a href="/alonzo-java/brief/2015/10/29/format-strings.html">Latest Post &mdash; Format-String All the Things!</a>
+  </h3>
+</section>
+</div>
+
+      </div>
+
+    <div class="col-md-8">
+    <div class="wrapper">
+      <header>
+        <h1>Format-String All the Things! <span style="float: right" class="tag">Brief</span></h1>
+        <p>October 29, 2015 • Alex Leighton</p>
+      </header>
+
+      <section>
+        
+        <div class="commit">
+          <a href="https://github.com/alexleighton/alonzo-java/commit/1f0b04e71923642f3b8d654390591970c7632d57">
+            This post is based on code found in commit <code>1f0b04e7192</code>
+          </a>
+        </div>
+        
+        <p>I’ve picked up a practice recently: any time I need to provide a message (typically for errors or logging), I make sure the function in question takes <code>varargs</code> and then pass them to <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html#format-java.lang.String-java.lang.Object...-"><code>String.format</code></a>. Most of the time I provide a message, I eventually want to use a format-string and it’s just lame to have to call <code>String.format</code> every time.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="k">throw</span> <span class="k">new</span> <span class="nf">UnexpectedIssueException</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="s">&quot;Could not invoke test method \&quot;%s\&quot;.&quot;</span><span class="o">,</span> <span class="n">testName</span><span class="o">);</span></code></pre></div>
+
+<p class="github_sample_ref"><small><a href="https://github.com/alexleighton/alonzo-java/blob/1f0b04e71923642f3b8d654390591970c7632d57//tst/alonzo/unit/RunnableTest.java#L84-L84">/tst/alonzo/unit/RunnableTest.java</a></small></p>
+
+
+      </section>
+    </div>
+    <footer>
+  <p>project maintained by <a href="http://github.com/alexleighton">Alex Leighton</a></p>
+  <p>original theme by <a href="https://github.com/orderedlist/modernist">orderedlist</a></p>
+</footer>
+
+    </div>
+    </div>
+    </div>
+    <script src="/alonzo-java/js/scale.fix.js"></script>
+  </body>
+</html>
