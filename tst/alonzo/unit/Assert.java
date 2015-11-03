@@ -18,6 +18,18 @@ public class Assert {
     }
 
     /**
+     * Checks that the given boolean expression is false, throwing {@link AssertionFailureException}
+     * if it is true.
+     * @param booleanExpr The boolean expression being asserted on.
+     * @throws AssertionFailureException if booleanExpr is true.
+     */
+    public static void assertFalse(final boolean booleanExpr) {
+        if (booleanExpr) {
+            throw new AssertionFailureException();
+        }
+    }
+
+    /**
      * Compares expected with actual for equality, throwing {@link AssertionFailureException} if
      * they are not equal. This function is null-safe.
      * @param expected The expected value of actual. May be {@code null}.
