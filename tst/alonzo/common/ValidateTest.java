@@ -29,10 +29,41 @@ public class ValidateTest {
     @Test
     public void notNullThrowsNullPointerExceptionWithMessage() {
         try {
-            Validate.notNull(null, "null with message");
+            Validate.notNull(null, "null with message %s", "and arg");
             fail("Expected NullPointerException.");
         } catch (NullPointerException e) {
-            assertEquals("null with message", e.getMessage());
+            assertEquals("null with message and arg", e.getMessage());
         }
     }
+
+    @Test
+    public void isFalse() {
+        try {
+            Validate.isFalse(false);
+        } catch (Throwable t) {
+            fail("Expected no exception to be thrown. Got %s: %s",
+                 t.getClass().getSimpleName(), t.getMessage());
+        }
+    }
+
+    @Test
+    public void isFalseThrowsIllegalArgumentException() {
+        try {
+            Validate.isFalse(true);
+            fail("Expected IllegalArgumentException.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("true expression", e.getMessage());
+        }
+    }
+
+    @Test
+    public void isFalseThrowsIllegalArgumentExceptionWithMessage() {
+        try {
+            Validate.isFalse(true, "true with message %s", "and arg");
+            fail("Expected IllegalArgumentException.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("true with message and arg", e.getMessage());
+        }
+    }
+
 }

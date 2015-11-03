@@ -54,12 +54,14 @@ public class Assert {
     }
 
     /**
-     * Fails the current test, using the given message as the reason.
+     * Fails the current test, using the given message as the reason. The given message and args are
+     * passed to {@link String#format(String, Object...)}.
      * @param message The reason the test failed.
+     * @param args The format-string arguments to message.
      * @throws AssertionFailureException with the given message.
      */
-    public static void fail(final String message) {
-        throw new AssertionFailureException(message);
+    public static void fail(String message, Object... args) {
+        throw new AssertionFailureException(String.format(message, args));
     }
 
 }

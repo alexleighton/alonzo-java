@@ -3,6 +3,28 @@ package alonzo.common;
 public class Validate {
 
     /**
+     * @see #isFalse(boolean, String, Object...)
+     */
+    public static void isFalse(final boolean expr) {
+        isFalse(expr, "true expression");
+    }
+
+    /**
+     * Throws {@link IllegalArgumentException} if the given boolean expression is true. The thrown
+     * {@link IllegalArgumentException} will contain a message created by passing msg and args to
+     * {@link String#format(String, Object...)}.
+     * @param expr The boolean expression to check for falsehood.
+     * @param msg The format string to use as the exception message if expr is true.
+     * @param args The arguments to msg for use if expr is true.
+     * @throws IllegalArgumentException if expr is true.
+     */
+    public static void isFalse(final boolean expr, final String msg, final Object... args) {
+        if (expr) {
+            throw new IllegalArgumentException(String.format(msg, args));
+        }
+    }
+
+    /**
      * @see #notNull(Object, String, Object...)
      */
     public static <T> T notNull(final T obj) {
@@ -25,4 +47,5 @@ public class Validate {
         }
         return obj;
     }
+
 }
