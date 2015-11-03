@@ -66,4 +66,34 @@ public class ValidateTest {
         }
     }
 
+    @Test
+    public void isTrue() {
+        try {
+            Validate.isTrue(true);
+        } catch (Throwable t) {
+            fail("Expected no exception to be thrown. Got %s: %s",
+                 t.getClass().getSimpleName(), t.getMessage());
+        }
+    }
+
+    @Test
+    public void isTrueThrowsIllegalArgumentException() {
+        try {
+            Validate.isTrue(false);
+            fail("Expected IllegalArgumentException.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("false expression", e.getMessage());
+        }
+    }
+
+    @Test
+    public void isTrueThrowsIllegalArgumentExceptionWithMessage() {
+        try {
+            Validate.isTrue(false, "false with message %s", "and arg");
+            fail("Expected IllegalArgumentException.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("false with message and arg", e.getMessage());
+        }
+    }
+
 }

@@ -3,6 +3,28 @@ package alonzo.common;
 public class Validate {
 
     /**
+     * @see #isTrue(boolean, String, Object...)
+     */
+    public static void isTrue(final boolean expr) {
+        isTrue(expr, "false expression");
+    }
+
+    /**
+     * Throws {@link IllegalArgumentException} if the given boolean expression is false. The thrown
+     * {@link IllegalArgumentException} will contain a message created by passing msg and args to
+     * {@link String#format(String, Object...)}.
+     * @param expr The boolean expression to check for truth.
+     * @param msg The format string to use as the exception message if expr is false.
+     * @param args The arguments to msg for use if expr is false.
+     * @throws IllegalArgumentException if expr is false.
+     */
+    public static void isTrue(final boolean expr, final String msg, final Object... args) {
+        if (!expr) {
+            throw new IllegalArgumentException(String.format(msg, args));
+        }
+    }
+
+    /**
      * @see #isFalse(boolean, String, Object...)
      */
     public static void isFalse(final boolean expr) {
