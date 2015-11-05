@@ -2,6 +2,9 @@ package alonzo.common;
 
 public class Validate {
 
+    // Prevent this class from be instantiated.
+    private Validate() {}
+
     /**
      * @see #isTrue(boolean, String, Object...)
      */
