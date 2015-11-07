@@ -2,6 +2,7 @@ package alonzo;
 
 import alonzo.ast.fmt.FormatterTest;
 import alonzo.common.ValidateTest;
+import alonzo.io.AlonzoReaderTest;
 import alonzo.io.StubReaderTest;
 import alonzo.unit.TestRunner;
 
@@ -12,6 +13,7 @@ public class TestingMain {
             .withTest(FormatterTest.class)
             .withTest(ValidateTest.class)
             .withTest(StubReaderTest.class)
+            .withTest(AlonzoReaderTest.class)
             .run();
     }
 
