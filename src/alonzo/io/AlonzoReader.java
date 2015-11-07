@@ -2,6 +2,7 @@ package alonzo.io;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.CharBuffer;
 
 import alonzo.common.Validate;
 
@@ -15,9 +16,7 @@ public class AlonzoReader implements AutoCloseable {
     private final Reader in;
     private boolean isClosed;
 
-    private final char[] buffer;
-    private int length;
-    private int index;
+    private final CharBuffer buffer;
 
     /**
      * The default buffer size to use.
@@ -27,17 +26,16 @@ public class AlonzoReader implements AutoCloseable {
 
     /**
      * Constructs an AlonzoReader instance wrapping the given Reader and with the given buffer size.
-     * @param in The Reader to read from.s
+     * @param reader The Reader to read from.
      * @param bufferSize The size of the buffer to use.
      */
-    public AlonzoReader(final Reader in, final int bufferSize) {
-        this.in = Validate.notNull(in, "null Reader");
-        this.isClosed = false;
+    public AlonzoReader(final Reader reader, final int bufferSize) {
+        in = Validate.notNull(reader, "null Reader");
+        isClosed = false;
 
         Validate.isTrue(bufferSize > 0, "negative buffer size (%d)", bufferSize);
-        this.buffer = new char[bufferSize];
-        this.index = 0;
-        this.length = 0;
+        buffer = CharBuffer.allocate(bufferSize);
+        buffer.limit(0);
     }
 
     /**
@@ -45,8 +43,8 @@ public class AlonzoReader implements AutoCloseable {
      * @see #AlonzoReader(Reader, int)
      * @see #DEFAULT_BUFFER_SIZE
      */
-    public AlonzoReader(final Reader in) {
-        this(in, DEFAULT_BUFFER_SIZE);
+    public AlonzoReader(final Reader reader) {
+        this(reader, DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -56,14 +54,12 @@ public class AlonzoReader implements AutoCloseable {
      *                     closed.
      */
     public int read() throws IOException {
-        if (isClosed) {
-            throw new IOException("Stream is closed");
-        }
+        if (isClosed) { throw new IOException("Stream is closed"); }
 
         if (bufferEmpty()) { fillBuffer(); }
-        if (bufferEmpty()) { return -1; }
+        if (bufferEmpty()) { return -1;    }
 
-        return buffer[index++];
+        return buffer.get();
     }
 
     /**
@@ -87,19 +83,19 @@ public class AlonzoReader implements AutoCloseable {
     }
 
     private void fillBuffer() throws IOException {
+        buffer.clear();
+
         int n = 0;
         while (n == 0) {
-            n = in.read(buffer, 0, buffer.length);
+            n = in.read(buffer);
         }
 
-        if (n > 0) {
-            length = n;
-            index = 0;
-        }
+        buffer.position(0);
+        buffer.limit(n > 0 ? n : 0);
     }
 
     private boolean bufferEmpty() {
-        return index >= length;
+        return !buffer.hasRemaining();
     }
 
 }
