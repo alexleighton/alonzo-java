@@ -18,6 +18,8 @@ public class AlonzoReader implements AutoCloseable {
 
     private final CharBuffer buffer;
 
+    private SourceLocation location;
+
     /**
      * The default buffer size to use.
      * @see #AlonzoReader(Reader)
@@ -36,6 +38,8 @@ public class AlonzoReader implements AutoCloseable {
         Validate.isTrue(bufferSize > 0, "negative buffer size (%d)", bufferSize);
         buffer = CharBuffer.allocate(bufferSize);
         buffer.limit(0);
+
+        location = SourceLocation.of(0, 1);
     }
 
     /**
@@ -49,17 +53,23 @@ public class AlonzoReader implements AutoCloseable {
 
     /**
      * Reads a character from the underlying Reader.
-     * @return a character from the underlying Reader, or -1 if there is no more input.
+     * @return a ReaderResult containing either the current character, or nothing if the end of the
+     *         stream was reached.
      * @throws IOException if the underlying Reader has a problem or if this reader is already
      *                     closed.
      */
-    public int read() throws IOException {
+    public ReaderResult read() throws IOException {
         if (isClosed) { throw new IOException("Stream is closed"); }
 
         if (bufferEmpty()) { fillBuffer(); }
-        if (bufferEmpty()) { return -1;    }
+        if (bufferEmpty()) { return ReaderResult.end(location); }
 
-        return buffer.get();
+        final char resultChar = buffer.get();
+        final ReaderResult result = ReaderResult.of(resultChar, location);
+
+        incrementLocation(resultChar);
+
+        return result;
     }
 
     /**
@@ -82,6 +92,10 @@ public class AlonzoReader implements AutoCloseable {
         return isClosed;
     }
 
+    private boolean bufferEmpty() {
+        return !buffer.hasRemaining();
+    }
+
     private void fillBuffer() throws IOException {
         buffer.clear();
 
@@ -94,8 +108,8 @@ public class AlonzoReader implements AutoCloseable {
         buffer.limit(n > 0 ? n : 0);
     }
 
-    private boolean bufferEmpty() {
-        return !buffer.hasRemaining();
+    private void incrementLocation(final char result) {
+        location = result == '\n' ? location.incrementLineNumber()
+                                  : location.incrementCharacter();
     }
-
 }

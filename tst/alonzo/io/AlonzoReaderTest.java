@@ -18,7 +18,10 @@ public class AlonzoReaderTest {
         final StringReader stringReader = new StringReader(sourceString);
 
         try (final AlonzoReader reader = new AlonzoReader(stringReader)) {
-            assertEquals('t', (char) reader.read());
+            final ReaderResult result = reader.read();
+            assertEquals('t', result.get());
+            assertEquals(0, result.location().character());
+            assertEquals(1, result.location().line());
         }
     }
 
@@ -56,8 +59,16 @@ public class AlonzoReaderTest {
     @Test
     public void endOfStream() throws IOException {
         try (final AlonzoReader reader = new AlonzoReader(new StringReader("t"))) {
-            assertEquals('t', reader.read());
-            assertEquals(-1, reader.read());
+            assertEquals('t', reader.read().get());
+
+            ReaderResult result = reader.read();
+            assertTrue(result.endOfStream());
+            assertEquals(SourceLocation.of(1, 1), result.location());
+
+            // End of stream results in the same location
+            result = reader.read();
+            assertTrue(result.endOfStream());
+            assertEquals(SourceLocation.of(1, 1), result.location());
         }
     }
 
@@ -66,8 +77,44 @@ public class AlonzoReaderTest {
         final StubReader stub = new StubReader.Builder("", "t").build();
 
         try (final AlonzoReader reader = new AlonzoReader(stub)) {
-            assertEquals('t', reader.read());
-            assertEquals(-1, reader.read());
+            assertEquals('t', reader.read().get());
+            assertTrue(reader.read().endOfStream());
+        }
+    }
+
+    @Test
+    public void newlineIncrementsLineNumber() throws IOException {
+        final StubReader stub = new StubReader.Builder("test\nnextLine\r\ntheEnd").build();
+        try (final AlonzoReader reader = new AlonzoReader(stub)) {
+            ReaderResult result = reader.read();
+            assertEquals(SourceLocation.of(0, 1), result.location());
+
+            for (int i = 0; i < 3; ++i) { reader.read(); }
+
+            // Newline character is on the same "line" as previous characters.
+            result = reader.read();
+            assertEquals('\n', result.get());
+            assertEquals(SourceLocation.of(4, 1), result.location());
+
+            // Next character gets the next line number.
+            result = reader.read();
+            assertEquals('n', result.get());
+            assertEquals(SourceLocation.of(0, 2), result.location());
+
+            for (int i = 0; i < 7; ++i) { reader.read(); }
+
+            // '/r' is not treated specially.
+            result = reader.read();
+            assertEquals('\r', result.get());
+            assertEquals(SourceLocation.of(8, 2), result.location());
+
+            result = reader.read();
+            assertEquals('\n', result.get());
+            assertEquals(SourceLocation.of(9, 2), result.location());
+
+            result = reader.read();
+            assertEquals('t', result.get());
+            assertEquals(SourceLocation.of(0, 3), result.location());
         }
     }
 
