@@ -53,13 +53,13 @@ public class AlonzoReader implements AutoCloseable {
 
     /**
      * Reads a character from the underlying Reader.
-     * @return a ReaderResult containing either the current character, or nothing if the end of the
-     *         stream was reached.
+     * @return a {@link ReaderResult} containing either the current character, or nothing if the
+     *         end of the stream was reached.
      * @throws IOException if the underlying Reader has a problem or if this reader is already
      *                     closed.
      */
     public ReaderResult read() throws IOException {
-        if (isClosed) { throw new IOException("Stream is closed"); }
+        ensureReaderOpen();
 
         if (bufferEmpty()) { fillBuffer(); }
         if (bufferEmpty()) { return ReaderResult.end(location); }
@@ -70,6 +70,23 @@ public class AlonzoReader implements AutoCloseable {
         incrementLocation(resultChar);
 
         return result;
+    }
+
+    /**
+     * Peeks at the next character from the underlying Reader.
+     * @return a {@link ReaderResult} containing either the current character, or nothing if the
+     *         end of the stream was reached.
+     * @throws IOException if the underlying Reader has a problem or if this reader is already
+     *                     closed.
+     */
+    public ReaderResult peek() throws IOException {
+        ensureReaderOpen();
+
+        if (bufferEmpty()) { fillBuffer(); }
+        if (bufferEmpty()) { return ReaderResult.end(location); }
+
+        final char resultChar = buffer.get(buffer.position());
+        return ReaderResult.of(resultChar, location);
     }
 
     /**
@@ -90,6 +107,12 @@ public class AlonzoReader implements AutoCloseable {
     /** @return true if this reader is closed, false otherwise. */
     public boolean isClosed() {
         return isClosed;
+    }
+
+    private void ensureReaderOpen() throws IOException {
+        if (isClosed) {
+            throw new IOException("Stream is closed");
+        }
     }
 
     private boolean bufferEmpty() {

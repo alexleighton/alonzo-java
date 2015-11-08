@@ -13,7 +13,7 @@ import alonzo.unit.Test;
 public class AlonzoReaderTest {
 
     @Test
-    public void basicRead() throws IOException {
+    public void read() throws IOException {
         final String sourceString = "testCharacters";
         final StringReader stringReader = new StringReader(sourceString);
 
@@ -22,6 +22,21 @@ public class AlonzoReaderTest {
             assertEquals('t', result.get());
             assertEquals(0, result.location().character());
             assertEquals(1, result.location().line());
+        }
+    }
+
+    @Test
+    public void peek() throws IOException {
+        final StubReader stub = new StubReader.Builder("12").build();
+        try (final AlonzoReader reader = new AlonzoReader(stub)) {
+            assertEquals('1', reader.peek().get());
+            assertEquals(SourceLocation.of(0, 1), reader.peek().location());
+            assertEquals('1', reader.peek().get());
+            assertEquals(SourceLocation.of(0, 1), reader.peek().location());
+            assertEquals('1', reader.read().get());
+
+            assertEquals('2', reader.peek().get());
+            assertEquals('2', reader.read().get());
         }
     }
 
